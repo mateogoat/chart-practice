@@ -22,6 +22,7 @@ const year = [...new Set(chartData.map(r => r.year))];
 const metrics = [...new Set(chartData.map(r => r.metrics))]
 
 
+
 genres.forEach(g => genreSelect.add(new Option(g, g)));
 platform.forEach(p => platformSelect.add(new Option(p, p)));
 publisher.forEach(p => publisherSelect.add(new Option(p, p)));
@@ -42,22 +43,23 @@ renderBtn.addEventListener("click", () => {
   const chartType = chartTypeSelect.value;
   const genre = genreSelect.value;
   const publisher = publisherSelect.value;
+  const year = yearSelect.value;
   const metric = metricSelect.value;
+  const platform = platformSelect.value;
 
   // Destroy old chart if it exists (common Chart.js gotcha)
   if (currentChart) currentChart.destroy();
 
   // Build chart config based on type
-  const config = buildConfig(chartType, { genre, platform, metric });
-
+  const config = buildConfig(chartType, { genre, platform, year, metric });
   currentChart = new Chart(canvas, config);
 });
 
 // --- Students: you’ll edit / extend these functions ---
-function buildConfig(type, { genre, platform, metric }) {
+function buildConfig(type, { genre, platform, year, metric }) {
   if (type === "bar") return barByNeighborhood(genre, metric);
   if (type === "scatter") return scatterTripsVsTemp(platform);
-  if (type === "doughnut") return doughnutMemberVsCasual(genre, platform);
+  if (type === "doughnut") return doughnutMemberVsCasual(year, platform);
   if (type === "radar") return radarCompareNeighborhoods(genre);
   return barByNeighborhood(genre, metric);
 }
@@ -145,21 +147,24 @@ function scatterTripsVsTemp(platform) {
 }
 
 // DOUGHNUT — member vs casual share for one platform + genre
-function doughnutMemberVsCasual(genre, platform) {
-  const row = chartData.find(r => r.genre === genre && r.platform === platform);
+function doughnutMemberVsCasual(year, platform) {
+  const selectedRecord = chartData.find(r => r.year === year && r.platform === platform);
+  const totalRegions = chartData.map(r => r.region).length
 
-  const racing = Math.round(row.genreSelect * 100);
-  const sim = 100 - racing;
+  const regionNA = (((chartData.filter(r => r.region === "NA").length) / totalRegions) * 100);
+  const regionEU = (((chartData.filter(r => r.region === "EU").length) / totalRegions) * 100);
+  const regionJP = (((chartData.filter(r => r.region === "JP").length) / totalRegions) * 100);
+  const regionASIA = (((chartData.filter(r => r.region === "ASIA").length) / totalRegions) * 100);
 
   return {
     type: "doughnut",
     data: {
-      labels: ["Racing (%)", "Sim (%)"],
-      datasets: [{ label: "Genre mix", data: [racing, sim] }]
+      labels: ["NA (%)", "ASIA (%)", "EU (%)", "JP (%)"],
+      data: [regionNA, regionEU, regionJP, regionASIA]
     },
     options: {
       plugins: {
-        title: { display: true, text: `Genre mix: ${platform} (${genre})` }
+        title: { display: true, text: `Region Mix: ${platform} (${year})` }
       }
     }
   };
