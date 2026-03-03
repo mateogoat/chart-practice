@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Sales (Chart.js Lab)</title>
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Chart.js via CDN (official docs recommend CDN options like jsDelivr) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+  <header class="container">
+    <h1>Game Sales Data</h1>
+    <p class="sub">
+      Build charts from real-ish city data. Start with Bar + Line, then pick an extension chart.
+    </p>
+  </header>
+
+  <main class="container grid">
+    <section class="card">
+      <h2>Controls</h2>
+
+      <label class="label">Chart</label>
+      <select id="chartType">
+        <option value="bar" selected>Bar (sales by platform/genre)</option>
+        <option value="line">Line (sales over years)</option>
+        <option value="scatter">Scatter (review score vs sales)</option>
+        <option value="doughnut">Doughnut (region share)</option>
+        <option value="radar">Radar (publishers across metrics)</option>
+      </select>
+
+      <label class="label">Genre</label>
+      <select id="genreSelect">
+        
+      </select>
+
+      <label class="label">Platform</label>
+      <select id="platformSelect">
+      
+      </select>
+
+      <label class="label">Year</label>
+      <select id="yearSelect">
+         
+      </select>
+
+      <label class="label">Publisher</label>
+      <select id="publisherSelect">
+      </select>
+
+      <label class="label">Metric</label>
+      <select id="metricSelect">
+        <option value="revenueUSD">Revenue (USD)</option>
+        <option value="esports">eSports</option>
+        <option value="priceUSD">priceUSD</option>
+        <option value="unitsM">unitsM</option>
+        <option value="reviewScore">Review Score</option>
+      </select>
+
+      <button id="renderBtn">Render Chart</button>
+
+      <div class="hint">
+        <strong>Goal:</strong> Make at least 2 different chart types using the dataset.
+      </div>
+    </section>
+
+    <section class="card chartCard">
+      <h2>Chart</h2>
+      <canvas id="chartCanvas" height="140"></canvas>
+      <p class="tiny">
+        If your chart doesn’t update, make sure you destroy the old chart instance first.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Dataset preview</h2>
+      <pre id="dataPreview"></pre>
+    </section>
+  </main>
+
+  <footer class="container foot">
+    <span>Chart.js Lab — Intro JS + Data Visualization</span>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
