@@ -43,7 +43,7 @@ renderBtn.addEventListener("click", () => {
   const chartType = chartTypeSelect.value;
   const genre = genreSelect.value;
   const publisher = publisherSelect.value;
-  const year = yearSelect.value;
+  const year = Number(yearSelect.value);
   const metric = metricSelect.value;
   const platform = platformSelect.value;
 
@@ -58,6 +58,7 @@ renderBtn.addEventListener("click", () => {
 // --- Students: you’ll edit / extend these functions ---
 function buildConfig(type, { genre, platform, year, metric }) {
   if (type === "bar") return barByNeighborhood(genre, metric);
+  if (type === "line") return lineOverTime(platform, [metric, "trips"]);
   if (type === "scatter") return scatterTripsVsTemp(platform);
   if (type === "doughnut") return doughnutMemberVsCasual(year, platform);
   if (type === "radar") return radarCompareNeighborhoods(genre);
@@ -147,20 +148,40 @@ function scatterTripsVsTemp(platform) {
 }
 
 // DOUGHNUT — member vs casual share for one platform + genre
+
 function doughnutMemberVsCasual(year, platform) {
-  const selectedRecord = chartData.find(r => r.year === year && r.platform === platform);
-  const totalRegions = chartData.map(r => r.region).length
+  // console.log(year, platform)
+  // console.log(typeof(year))
+  const filtered = chartData.filter(r => r.year === year && r.platform === platform);
+  // console.log(filtered);
+  const totalRegions = filtered.map(r => r.region).length;
+  // console.log(totalRegions)
 
-  const regionNA = (((chartData.filter(r => r.region === "NA").length) / totalRegions) * 100);
-  const regionEU = (((chartData.filter(r => r.region === "EU").length) / totalRegions) * 100);
-  const regionJP = (((chartData.filter(r => r.region === "JP").length) / totalRegions) * 100);
-  const regionASIA = (((chartData.filter(r => r.region === "ASIA").length) / totalRegions) * 100);
+  const regions = [...new Set(filtered.map(r => r.region))];
 
+  // const regionNA = (((filtered.filter(r => r.region === "NA").length) / totalRegions) * 100);
+  // const regionEU = (((filtered.filter(r => r.region === "EU").length) / totalRegions) * 100);
+  // const regionJP = (((filtered.filter(r => r.region === "JP").length) / totalRegions) * 100);
+  // const regionASIA = (((filtered.filter(r => r.region === "ASIA").length) / totalRegions) * 100);
+  // const regionNA = (((filtered.filter(r => r.region === "NA").length) / totalRegions) * 100).toFixed(2);
+ // const regionNA = (((filtered.filter(r => r.region === "NA").length) / totalRegions) * 100).toFixed(2);
+  const regionSums = regions.map(region => {
+    const count = filtered.filter(r => r.region === region).length;
+    return ((count / totalRegions) * 100).toFixed(2);
+  });
+  // console.log(`Sums`, regionSums);
+  // regions.forEach(r => console.log(`Region`, r));
+  // console.log(regions.length);
+  // console.log(regions[0], regionSums[0]);
+  
   return {
     type: "doughnut",
+    
     data: {
-      labels: ["NA (%)", "ASIA (%)", "EU (%)", "JP (%)"],
-      data: [regionNA, regionEU, regionJP, regionASIA]
+      labels: regions,
+      datasets: [{
+        data:[...regionSums],
+      }]
     },
     options: {
       plugins: {
