@@ -57,16 +57,16 @@ renderBtn.addEventListener("click", () => {
 
 // --- Students: you’ll edit / extend these functions ---
 function buildConfig(type, { genre, platform, year, metric }) {
-  if (type === "bar") return barByNeighborhood(genre, metric);
-  if (type === "line") return lineOverTime(platform, [metric, "trips"]);
-  if (type === "scatter") return scatterTripsVsTemp(platform);
-  if (type === "doughnut") return doughnutMemberVsCasual(year, platform);
-  if (type === "radar") return radarCompareNeighborhoods(genre);
-  return barByNeighborhood(genre, metric);
+  if (type === "bar") return barByGenre(genre, metric);
+  if (type === "line") return lineOverTime(platform, [metric, "platforms"]);
+  if (type === "scatter") return scatterGenreVsPlatform(platform);
+  if (type === "doughnut") return doughnutYearVsPlatform(year, platform);
+  if (type === "radar") return radarCompareGenres(genre);
+  return barByGenre(genre, metric);
 }
 
-// Task A: BAR — compare neighborhoods for a given genre
-function barByNeighborhood(genre, metric) {
+// Task A: BAR — compare metrics for a given genre
+function barByGenre(genre, metric) {
   const rows = chartData.filter(r => r.genre === genre);
 
   const labels = rows.map(r => r.platform);
@@ -94,7 +94,7 @@ function barByNeighborhood(genre, metric) {
   };
 }
 
-// Task B: LINE — trend over time for one neighborhood (2 datasets)
+// Task B: LINE — trend overtime with platform and it's genres and metrics (2 datasets)
 function lineOverTime(platform, metrics) {
   const rows = chartData.filter(r => r.platform === platform);
 
@@ -121,35 +121,36 @@ function lineOverTime(platform, metrics) {
   };
 }
 
-// SCATTER — relationship between temperature and trips
-function scatterTripsVsTemp(platform) {
+// SCATTER — relationship between genre and platform
+function scatterGenreVsPlatform(platform) {
   const rows = chartData.filter(r => r.platform === platform);
 
-  const points = rows.map(r => ({ x: r.tempC, y: r.trips }));
+  const points = rows.map(r => ({ x: r.reviewScore, y: r.revenueUSD }));
 
+  
   return {
     type: "scatter",
     data: {
       datasets: [{
-        label: `Trips vs Temp (${platform})`,
+        label: `Genre vs Platform (${platform})`,
         data: points
       }]
     },
     options: {
       plugins: {
-        title: { display: true, text: `Does temperature affect trips? (${platform})` }
+        title: { display: true, text: `Does genre affect game platform? (${platform})` }
       },
       scales: {
-        x: { title: { display: true, text: "Temperature (C)" } },
-        y: { title: { display: true, text: "Trips" } }
+        x: { title: { display: true, text: "Genre" } },
+        y: { title: { display: true, text: "Platform" } }
       }
     }
   };
 }
 
-// DOUGHNUT — member vs casual share for one platform + genre
+// DOUGHNUT — year v/s platform 
 
-function doughnutMemberVsCasual(year, platform) {
+function doughnutYearVsPlatform(year, platform) {
   // console.log(year, platform)
   // console.log(typeof(year))
   const filtered = chartData.filter(r => r.year === year && r.platform === platform);
@@ -159,12 +160,6 @@ function doughnutMemberVsCasual(year, platform) {
 
   const regions = [...new Set(filtered.map(r => r.region))];
 
-  // const regionNA = (((filtered.filter(r => r.region === "NA").length) / totalRegions) * 100);
-  // const regionEU = (((filtered.filter(r => r.region === "EU").length) / totalRegions) * 100);
-  // const regionJP = (((filtered.filter(r => r.region === "JP").length) / totalRegions) * 100);
-  // const regionASIA = (((filtered.filter(r => r.region === "ASIA").length) / totalRegions) * 100);
-  // const regionNA = (((filtered.filter(r => r.region === "NA").length) / totalRegions) * 100).toFixed(2);
- // const regionNA = (((filtered.filter(r => r.region === "NA").length) / totalRegions) * 100).toFixed(2);
   const regionSums = regions.map(region => {
     const count = filtered.filter(r => r.region === region).length;
     return ((count / totalRegions) * 100).toFixed(2);
@@ -191,8 +186,8 @@ function doughnutMemberVsCasual(year, platform) {
   };
 }
 
-// RADAR — compare neighborhoods across multiple metrics for one genre
-function radarCompareNeighborhoods(genre) {
+// RADAR — compare metrics across multiple genre
+function radarCompareGenres(genre) {
   const rows = chartData.filter(r => r.genre === genre);
 
   const metrics = ["priceUSD", "revenueUSD", "esports", "unitsM", "reviewScore"];
